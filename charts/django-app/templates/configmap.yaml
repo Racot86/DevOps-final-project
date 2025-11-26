@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: django-config
-data:
-  DEBUG: "False"
-  SECRET_KEY: "supersecret"
-  DATABASE_URL: "postgres://..."

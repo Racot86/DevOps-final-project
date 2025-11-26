@@ -10,3 +10,10 @@ service:
 image:
   repository: 606705194042.dkr.ecr.us-west-2.amazonaws.com/lesson-5-ecr
   tag: latest
+
+env:
+  DB_NAME: app_db
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  DB_HOST: db
+  DEBUG: "1"

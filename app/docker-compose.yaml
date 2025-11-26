@@ -1,36 +1,32 @@
-version: "3.9"
+version: '3.8'
 
 services:
   web:
     build:
-      context: .
+      context: ../backend-source/app
       dockerfile: Dockerfile
-    container_name: django_app
-    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000
+    container_name: node_app
+    restart: always
     ports:
       - "8000:8000"
-    environment:
-      DB_NAME: appdb
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_HOST: db
-      DEBUG: "1"
+    env_file:
+      - ../backend-source/app/.env
     depends_on:
       - db
-    volumes:
-      - ./app:/app
 
   db:
-    image: postgres:15
+    image: postgres:14-alpine
     container_name: postgres_db
+    restart: always
     environment:
-      POSTGRES_DB: appdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=app_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../backend-source/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   postgres_data:

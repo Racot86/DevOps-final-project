@@ -71,7 +71,7 @@ controller:
         jobs:
           - script: >
               job('seed-job') {
-                description('Job to generate pipeline for Django project')
+                description('Job to generate pipeline for Node.js project')
                 scm {
                   git {
                     remote {
@@ -84,7 +84,7 @@ controller:
                 steps {
                   dsl {
                     text('''
-                      pipelineJob("goit-django-docker") {
+                      pipelineJob("goit-node-docker") {
                         definition {
                           cpsScm {
                             scm {
