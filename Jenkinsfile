@@ -37,7 +37,7 @@ spec:
     }
   }
   environment {
-    // Будь-які значення можна зберегти в Jenkins Credentials та прив'язати через withCredentials
+    // Any values can be stored in Jenkins Credentials and bound via withCredentials
     ECR_REGISTRY = '606705194042.dkr.ecr.us-west-2.amazonaws.com'
     ECR_REPO = 'lesson-5-ecr'
     CHART_PATH = 'charts/node-app/values.yaml'
@@ -46,10 +46,10 @@ spec:
     stage('Prepare') {
       steps {
         container('git') {
-          // Підтягуємо весь репо в робочий простір
+          // Pull the entire repository into the workspace
           checkout scm
           script {
-            // тег образу - використай timestamp або git commit id
+            // Image tag - use a timestamp or git commit id
             IMAGE_TAG = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
             env.IMAGE_TAG = IMAGE_TAG
           }
@@ -60,22 +60,22 @@ spec:
     stage('Build & Push image (Kaniko)') {
       steps {
         script {
-          // Беремо AWS creds з Jenkins credentials: ID = aws-creds (username=AWS_ACCESS_KEY_ID, password=AWS_SECRET_ACCESS_KEY)
+          // Retrieve AWS credentials from Jenkins credentials: ID = aws-creds (username=AWS_ACCESS_KEY_ID, password=AWS_SECRET_ACCESS_KEY)
           withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY'),
                            string(credentialsId: 'git-ssh-key', variable: 'GIT_SSH_KEY')]) {
-            // створимо docker config у томі під Kaniko
+            // Create docker config in the Kaniko volume
             sh '''
             mkdir -p ~/.docker
             cat > ~/.docker/config.json <<EOF
             {"credsStore":"ecr-login"}
             EOF
             '''
-            // Додатково: налаштування для Kaniko - передамо AWS creds в контейнер Kaniko через env
+            // Additionally: Kaniko settings - pass AWS creds to the Kaniko container via environment variables
           }
         }
-        // Запускаємо контейнер kaniko (kubectl-проxies handled by Jenkins kubernetes plugin)
+        // Run the Kaniko container (kubectl proxies handled by the Jenkins Kubernetes plugin)
         container('kaniko') {
-          // env AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY повинні бути доступні через Jenkins credentials на вузлі
+          // env AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY must be available via Jenkins credentials on the node
           sh '''
           echo "Running Kaniko..."
           # Kaniko reads AWS creds from environment variables

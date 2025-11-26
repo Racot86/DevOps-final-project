@@ -1,30 +1,30 @@
 applications:
-  - name: example-app   # ім’я застосунку в Argo CD
-    namespace: default  # namespace у Kubernetes
-    project: default    #  назва Argo CD проєкту
-    source:             # джерело коду застосунку
+  - name: example-app   # application name in Argo CD
+    namespace: default  # Kubernetes namespace
+    project: default    # Argo CD project name
+    source:             # application source code
       # repoURL: https://github.com/YOUR_USERNAME/example-repo.git
-      repoURL: ${github_repo_url} # посилання на Git-репозиторій, де зберігаються Helm chart або Kubernetes маніфести
-      path: charts/node-app       # шлях усередині репозиторію до потрібного чарта або YAML-файлів
-      targetRevision: lesson-9    # гілка або тег Git, з якого брати застосунок (наприклад, main)
+      repoURL: ${github_repo_url} # link to the Git repository where Helm charts or Kubernetes manifests are stored
+      path: charts/node-app       # path inside the repository to the required chart or YAML files
+      targetRevision: lesson-9    # branch or Git tag to pull the app from (e.g., main)
       helm:
-        valueFiles:               # перелік YAML-файлів із налаштуваннями, які будуть передані Helm-чарту
+        valueFiles:               # list of values files to pass to the Helm chart
           - values.yaml
-    destination:                              # вказує, куди саме деплоїти застосунок
-      server: https://kubernetes.default.svc  # адреса Kubernetes API-сервера. Для внутрішнього кластера використовується https://kubernetes.default.svc
-      namespace: default                      # Kubernetes namespace для цього конкретного застосунку
-    syncPolicy:           # політика синхронізації
-      automated:          # включає автоматичне застосування змін
-        prune: true       # видаляти ресурси, які більше не описані у Git
-        selfHeal: true    # автоматично виправляти відхилення від Git-стану, якщо щось змінилось вручну у кластері
+    destination:                              # specifies where to deploy the application
+      server: https://kubernetes.default.svc  # Kubernetes API server address; for in-cluster use https://kubernetes.default.svc
+      namespace: default                      # Kubernetes namespace for this particular application
+    syncPolicy:           # synchronization policy
+      automated:          # enables automatic application of changes
+        prune: true       # delete resources no longer described in Git
+        selfHeal: true    # automatically correct drift from Git state if something changed manually in the cluster
 
 repositories:
-  - name: example-app         # ім’я репозиторію для внутрішнього використання
+  - name: example-app         # repository name for internal use
     # url: https://github.com/YOUR_USERNAME/example-repo.git
-    url: ${github_repo_url}   # повна URL-адреса Git-репозиторію
-    username: ${github_user}  # облікові дані для доступу до приватного репозиторію
+    url: ${github_repo_url}   # full URL of the Git repository
+    username: ${github_user}  # credentials for accessing the private repository
     password: ${github_pat}
 
 repoConfig:
-  insecure: "true"    # дозволяє підключення до репозиторію без перевірки SSL-сертифікатів. Не рекомендується для продакшену
-  enableLfs: "true"   # дозволяє використання Git LFS (Large File Storage), якщо в репозиторії зберігаються великі файли
+  insecure: "true"    # allow connecting to the repository without SSL certificate verification; not recommended for production
+  enableLfs: "true"   # enable Git LFS (Large File Storage) if large files are stored in the repository
