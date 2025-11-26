@@ -1,0 +1,105 @@
+controller:
+  admin:
+    username: admin
+    password: admin123
+
+  service:
+    type: LoadBalancer
+    port: 80
+
+  kubernetes:
+    enabled: true
+    namespace: jenkins
+    jenkinsUrl: "http://jenkins:8080"
+
+  podTemplates:
+    - name: kaniko
+      label: kaniko
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:latest
+          command: ["/kaniko/executor"]
+        - name: awscli
+          image: amazon/aws-cli:2.9.0
+        - name: git
+          image: alpine/git:latest
+
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+
+  persistentVolume:
+    enabled: true
+    storageClass: ebs-sc
+    size: 10Gi
+
+  installPlugins:
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - git:latest
+    - configuration-as-code:latest
+    - credentials-binding:latest
+    - github:latest
+    - docker-plugin:latest
+    - docker-workflow:latest
+    - job-dsl:latest
+
+  serviceAccount:
+    name: jenkins-kaniko-sa
+    create: false
+
+  JCasC:
+    enabled: true
+    configScripts:
+      credentials: |
+        credentials:
+          system:
+            domainCredentials:
+              - credentials:
+                  - usernamePassword:
+                      scope: GLOBAL
+                      id: github-token
+                      username: "ваш_github_user"
+                      password: "ваш_github_pat"
+                      description: GitHub PAT
+
+      seed-job: |
+        jobs:
+          - script: >
+              job('seed-job') {
+                description('Job to generate pipeline for Django project')
+                scm {
+                  git {
+                    remote {
+                      url('ваш_github_repo_url')
+                      credentials('github-token')
+                    }
+                    branches('*/lesson-9')
+                  }
+                }
+                steps {
+                  dsl {
+                    text('''
+                      pipelineJob("goit-django-docker") {
+                        definition {
+                          cpsScm {
+                            scm {
+                              git {
+                                remote {
+                                  url("ваш_github_repo_url")
+                                  credentials("github-token")
+                                }
+                                branches("*/lesson-9")
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ''')
+                  }
+                }
+              }

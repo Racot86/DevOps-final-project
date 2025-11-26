@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Node.js application
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: node_app
+    restart: always
+    env_file:
+      - ./app/.env
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # PostgreSQL database
+  db:
+    image: postgres:14-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=app_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  # Nginx web server
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx_server
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
