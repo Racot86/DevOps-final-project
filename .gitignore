@@ -1,2 +1,32 @@
 /.idea/
 /terraform.tfvars
+
+# Terraform local state and caches
+/.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate.backup
+crash.log
+*.tfplan
+
+# Sensitive Terraform variables (keep only example tracked)
+*.tfvars
+!terraform.tfvars.example
+
+# Environment files
+.env
+.env.*
+/backend-source/app/.env
+
+# SSH keys and certificates
+id_rsa
+id_rsa.pub
+*.pem
+*.key
+
+# Kubernetes kubeconfig
+kubeconfig
+
+# Editor/OS noise
+.DS_Store
+.vscode/

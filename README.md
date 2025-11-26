@@ -58,6 +58,10 @@ Project/
 - awscli
 - Helm
 
+Secrets and local config:
+- Copy terraform.tfvars.example to terraform.tfvars and fill in your own values (file is git-ignored)
+- Alternatively, export TF_VAR_* env vars instead of using terraform.tfvars
+
 ---
 
 ## Step-by-step
@@ -112,6 +116,10 @@ Open Grafana at http://localhost:3000 and check dashboards/metrics.
 
 - Cloud costs: always destroy unused resources after validation.
 - State backend: if you removed S3/DynamoDB with terraform destroy, remember to recreate or reconfigure backend before next runs.
+
+Security and secrets hygiene:
+- Never commit real secrets. The repository .gitignore excludes *.tfvars and .env files
+- Use terraform.tfvars (local) or TF_VAR_* environment variables for sensitive values
 
 Destroy infrastructure when done:
 

@@ -1,0 +1,11 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# IMPORTANT: Do NOT commit real secrets. terraform.tfvars is ignored by .gitignore
+
+github_pat       = "YOUR_GITHUB_PAT_HERE"
+github_user      = "YOUR_GITHUB_USERNAME"
+github_repo_url  = "https://github.com/YOUR_USERNAME/YOUR_REPO"
+
+# You may also export environment variables instead of using terraform.tfvars:
+#   export TF_VAR_github_pat=...
+#   export TF_VAR_github_user=...
+#   export TF_VAR_github_repo_url=...
